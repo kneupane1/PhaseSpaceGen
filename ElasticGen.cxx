@@ -10,7 +10,7 @@
 #include "TRandom3.h"
 #include "constants.h"
 #include "physics.h"
-//#include "radcorr.h"
+// #include "radcorr.h"
 #ifdef PLOTS
 #include "TFile.h"
 #include "TH1.h"
@@ -53,20 +53,48 @@ int main(int argc, char *argv[]) {
   Double_t masses[2] = {MASS_E, MASS_P};
 
   // Get random seed to set randomness in TRandom3 for TGenPhaseSpace
-  std::mt19937_64 prng;
+  std::mt19937_64  // WHY WE NEED THIS VERSION?
+      prng;  // pseudorandom number generator (PRNG). The specific variant mt19937_64 generates 64-bit random numbers.
   auto seed = std::random_device{}();
   prng.seed(seed);
   delete gRandom;
   auto TRandSeed = gRandom = new TRandom3(prng());
   auto event = std::unique_ptr<TGenPhaseSpace>(new TGenPhaseSpace());
+  //  Utility class to generate n-body event,
+  // with constant cross-section (default)
+  // or with Fermi energy dependence (opt="Fermi").
+  // The event is generated in the center-of-mass frame,
+  // but the decay products are finally boosted
+  // using the betas of the original particle.
 
   event->SetDecay(cms, 2, masses);
+  // Bool_t SetDecay(TLorentzVector& P, Int_t nt, Double_t* mass, Option_t* opt = "")
+  // input:
+  //  TLorentzVector &P:    decay particle (Momentum, Energy units are Gev/C, GeV)
+  //  Int_t nt:             number of decay products
+  //  Double_t *mass:       array of decay product masses
+  //  Option_t *opt:        default -> constant cross section
+  //                        "Fermi" -> Fermi energy dependece
+  //  return value:
+  //  kTRUE:      the decay is permitted by kinematics
+  //  kFALSE:     the decay is forbidden by kinematics
+
   bool radiative_corrections = false;
   int n = 0;
   int total = 0;
   while (n < gen_num) {
     Double_t weight = event->Generate();
+    // Double_t Generate()
+    //  TLorentzVector * GetDecay(Int_t n)
+    //   Generate a random final state.
+    //   The function returns the weigth of the current event.
+    //   The TLorentzVector of each decay product can be obtained using GetDecay(n).
+
     auto Eprime = event->GetDecay(0);
+
+    // TLorentzVector * GetDecay(Int_t n)
+    // return Lorentz vector corresponding to decay 0
+
     auto Proton = event->GetDecay(1);
 
     double W = physics::W_calc(beam, *Eprime);
