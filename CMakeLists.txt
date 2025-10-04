@@ -33,6 +33,8 @@ set(PROGRAMS
     ElasticGen
     NpipGen
     ThreePi
+    PhiGen
+    PhiGen_WT
 )
 
 foreach(prog ${PROGRAMS})

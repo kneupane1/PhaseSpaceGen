@@ -18,13 +18,13 @@
 
 int main(int argc, char *argv[]) {
   std::string file_name = "";
-  long genNum = 10000;
+  long genNum = 10;
   long seed;
   float energy = 10.6;
-  float q2_min = 0.0;
-  float q2_max = 20.0;
-  float w_min = 0.0;
-  float w_max = 12.0;
+  float q2_min = 1.95;
+  float q2_max = 9.0;
+  float w_min = 1.35;
+  float w_max = 2.15;
   bool print_help;
   bool clas12MCgen = false;
 
@@ -105,9 +105,7 @@ int main(int argc, char *argv[]) {
     auto Pip = event->GetDecay(1);
     auto Pim = event->GetDecay(2);
     auto Pi0 = event->GetDecay(3);
-    auto P = event->GetDecay(4);
-
-    // Calcultae W and Q2 for acceptance [and plots]
+    auto P = event->GetDecay(4);  // Calcultae W and Q2 for acceptance [and plots]
     double W = physics::W_calc(beam, *Eprime);
     double Q2 = physics::Q2_calc(beam, *Eprime);
 
@@ -139,7 +137,7 @@ int main(int argc, char *argv[]) {
 
     // Check to see if the total number of events is 100x greater than generated
     // If we have 100x gen number quit because something is probably wrong
-    if (total++ > 100 * genNum) {
+    if (total++ > 100000 * genNum) {
       std::cerr << "[" << __FUNCTION__ << "] Ended with break\n";
       break;
     }
@@ -149,7 +147,7 @@ int main(int argc, char *argv[]) {
   myfile.close();
 
   // Print report at the end
-  std::cout << acc << " accepted, " << total << " generated " << 100 * acc / total << "\% accepted " << std::endl;
+  std::cout << acc << " accepted, " << total << " generated " << 100.0 * acc / total << "\% accepted " << std::endl;
 
 #ifdef PLOTS
   auto f = new TFile(Form("%s.root", file_name.c_str()), "RECREATE");
